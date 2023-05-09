@@ -1,0 +1,16 @@
+.idea
+.DS_Store
+
+*.swp
+*.swo
+
+.test
+test.log.*
+*.log
+example
+
+main
+
+test/*
+
+*.bk

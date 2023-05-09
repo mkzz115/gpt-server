@@ -1,0 +1,12 @@
+log_path = "./test.log"
+[mysql]
+    address = "127.0.0.1:3306"
+    database = "info_d"
+    user = "root"
+    password = "12345"
+[server]
+    name = "Gpt Server"
+    host = "0.0.0.0"
+    port = 12308
+    key = ""
+
