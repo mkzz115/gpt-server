@@ -12,6 +12,7 @@ import (
 type ChatsReq struct {
     Content    string        `json:"content"`
     HistoryMsg []HistoryChat `json:"history_msg"`
+    SystemRole string        `json:"system_role,omitempty"`
 }
 
 type ChatsRes struct {
@@ -40,6 +41,12 @@ func (p *ProecssorHandle) GptChatWithHistory(w http.ResponseWriter, r *http.Requ
         return
     }
     history := []openai.ChatCompletionMessage{}
+    if len(req.SystemRole) > 0 {
+        history = append(history, openai.ChatCompletionMessage{
+            Role:    openai.ChatMessageRoleSystem,
+            Content: req.SystemRole,
+        })
+    }
     for i := 0; i < len(req.HistoryMsg); i++ {
         role1 := openai.ChatCompletionMessage{
             Role:    openai.ChatMessageRoleUser,
