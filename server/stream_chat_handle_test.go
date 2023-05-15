@@ -12,7 +12,7 @@ func TestProecssorHandle_GptChatWithHistory(t *testing.T) {
     c := http.Client{}
     url := "http://127.0.0.1:12308/chat"
     req1 := ChatsReq{}
-    req1.Content = "请为我写一个国企风格的工作汇报材料，字数在100字左右"
+    req1.Content = "请为我写一个国企风格的工作汇报材料，字数在200字左右"
     req1.HistoryMsg = []HistoryChat{}
 
     resp1, err := singleReq(url, &c, req1, t)
@@ -21,7 +21,7 @@ func TestProecssorHandle_GptChatWithHistory(t *testing.T) {
         return
     }
 
-    t.Logf("rep1:\n %s", resp1.Result)
+    //t.Logf("rep1:\n %s", resp1.Result)
     req2 := ChatsReq{}
     req2.Content = "太官方了，稍微活泼一点"
     req2.HistoryMsg = []HistoryChat{
@@ -35,7 +35,7 @@ func TestProecssorHandle_GptChatWithHistory(t *testing.T) {
         t.Error(err)
         return
     }
-    t.Logf("\nresp2\n%s", resp2.Result)
+    //t.Logf("\nresp2\n%s", resp2.Result)
     req3 := ChatsReq{}
     req3.Content = "单位年轻人比较多，风格上时髦一些"
     req3.HistoryMsg = req2.HistoryMsg
@@ -49,12 +49,27 @@ func TestProecssorHandle_GptChatWithHistory(t *testing.T) {
         t.Error(err)
         return
     }
-    t.Logf("\nresp3:\n %s", resp3.Result)
+    //t.Logf("\nresp3:\n %s", resp3.Result)
+    req4 := ChatsReq{}
+    req4.Content = "多引用一些诗词，文艺一点的"
+    req4.HistoryMsg = req3.HistoryMsg
+    req4.HistoryMsg = append(req4.HistoryMsg,
+        HistoryChat{
+            UserChat: req3.Content,
+            GPTChat:  resp3.Result,
+        })
+    resp4, err := singleReq(url, &c, req4, t)
+    if err != nil {
+        t.Error(err)
+        return
+    }
+    t.Logf("\nresp3:\n %s", resp4.Result)
 }
 
 func singleReq(url string, c *http.Client, req2 ChatsReq, t *testing.T) (ChatsRes, error) {
     resp2 := ChatsRes{}
     buf, err := json.Marshal(req2)
+    t.Logf("req: ==> %s\n", string(buf))
     res2, err := c.Post(url, "application/json", bytes.NewBuffer(buf))
     if err != nil {
         t.Error(err)

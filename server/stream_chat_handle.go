@@ -9,6 +9,10 @@ import (
     "net/http"
 )
 
+var (
+    tokenLimit int = 1024
+)
+
 type ChatsReq struct {
     Content    string        `json:"content"`
     HistoryMsg []HistoryChat `json:"history_msg"`
@@ -54,7 +58,7 @@ func (p *ProecssorHandle) GptChatWithHistory(w http.ResponseWriter, r *http.Requ
         }
         role2 := openai.ChatCompletionMessage{
             Role:    openai.ChatMessageRoleAssistant,
-            Content: req.HistoryMsg[i].UserChat,
+            Content: req.HistoryMsg[i].GPTChat,
         }
         history = append(history, role1, role2)
     }
@@ -63,9 +67,25 @@ func (p *ProecssorHandle) GptChatWithHistory(w http.ResponseWriter, r *http.Requ
         Content: req.Content,
     })
 
+    currentTokens := 0
+    for _, h := range history {
+        currentTokens += CountTokens(h.Content)
+        if currentTokens > tokenLimit {
+            for i := 0; i < len(history); i++ {
+                currentTokens -= CountTokens(history[i].Content)
+                history = history[i+1:]
+                if currentTokens <= tokenLimit {
+                    break
+                }
+            }
+            break
+        }
+    }
+
     aiReq := openai.ChatCompletionRequest{
-        Model:    openai.GPT3Dot5Turbo,
-        Messages: history,
+        Model:       openai.GPT3Dot5Turbo,
+        Messages:    history,
+        Temperature: 1.2,
     }
 
     ctx := context.Background()

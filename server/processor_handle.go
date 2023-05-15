@@ -6,6 +6,10 @@ import (
     "os"
 )
 
+var (
+    noneKeyCode = -1
+)
+
 type ProecssorHandle struct {
     OpenaiClient *openai.Client
     Key          string
@@ -20,7 +24,7 @@ func NewProcessorHandle(c *Config) *ProecssorHandle {
         p.Key = c.Server.Key
     } else {
         log.Panicf("invalid key")
-        os.Exit(-1)
+        os.Exit(noneKeyCode)
     }
     p.OpenaiClient = openai.NewClient(p.Key)
     return p
