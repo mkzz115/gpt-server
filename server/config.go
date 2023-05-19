@@ -23,6 +23,7 @@ type ServerConf struct {
     Host string `toml:"host"`
     Port int32  `toml:"port"`
     Key  string `toml:"key"`
+    SKey string `toml:"s_key"`
 }
 
 func ReadConfig(path string) *Config {
